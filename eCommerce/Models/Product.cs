@@ -17,6 +17,7 @@ public class Product
     /// <summary>
     /// Gets or sets the title of the product that the consumer will see.
     /// </summary>
+    [Required]
     [StringLength(50, ErrorMessage = "Title cannot exceed 50 characters.")]
     public required string Title { get; set; }
     
