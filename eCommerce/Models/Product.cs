@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace eCommerce.Models;
 
@@ -25,6 +26,7 @@ public class Product
     /// Gets or sets the current sales price of a product sold on Zac's Smoke Shop.
     /// </summary>
     [Range(0, 10_000, ErrorMessage = "Price must be between 0 and 10,000.")]
+    [Precision(18, 2)]
     public decimal Price { get; set; }
     
     /// <summary>
@@ -33,3 +35,5 @@ public class Product
     public string? Description { get; set; }
 }
 
+// add migration after creating new columns in the Product model using the following command in the Package Manager Console:
+// PM> Add-Migration AddNewColumnsToProductModel
