@@ -17,7 +17,7 @@ public class ProductController : Controller
     public async Task<IActionResult> Index()
     {
         // Retrieve the list of products from the database
-        List<Product> allProducts = await _context.Products.ToListAsync();
+        List<Product> allProducts = await _context.Products.AsNoTracking().ToListAsync();
         return View(allProducts);
     }
 
