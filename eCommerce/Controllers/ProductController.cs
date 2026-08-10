@@ -37,6 +37,9 @@ public class ProductController : Controller
             _context.Products.Add(product);
             await _context.SaveChangesAsync();
 
+            // Show a success message to the user
+            TempData["SuccessMessage"] = $"{product.Title} created successfully!";
+
             // Redirect to the product list page
             return RedirectToAction(nameof(Index));
         }
