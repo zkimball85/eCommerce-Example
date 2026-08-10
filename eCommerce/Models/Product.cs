@@ -27,6 +27,7 @@ public class Product
     /// </summary>
     [Range(0, 10_000, ErrorMessage = "Price must be between 0 and 10,000.")]
     [Precision(18, 2)]
+    [DataType(DataType.Currency)]
     public decimal Price { get; set; }
     
     /// <summary>
