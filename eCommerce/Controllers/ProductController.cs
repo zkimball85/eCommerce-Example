@@ -45,4 +45,17 @@ public class ProductController : Controller
         }
         return View(product);
     }
+
+    [HttpGet]
+
+    public async Task<IActionResult> Edit(int id)
+    {
+        // Retrieve the product from the database
+        Product? product = await _context.Products.Where(p => p.ProductId == id).FirstOrDefaultAsync();
+        if (product == null)
+        {
+            return NotFound();
+        }
+        return View(product);
+    }
 }
