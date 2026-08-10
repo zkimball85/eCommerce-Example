@@ -3,11 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace eCommerce.Data;
 
-public class ProductDbContext : DbContext
+public class ProductDbContext(DbContextOptions options) : DbContext(options)
 {
-    public ProductDbContext(DbContextOptions options) : base(options)
-    {
-    }
+    public required DbContextOptions<ProductDbContext> options;
 
     // Entities to be added to the database context
     public DbSet<Product> Products { get; set; }
