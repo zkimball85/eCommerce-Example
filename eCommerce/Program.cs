@@ -1,9 +1,16 @@
-var builder = WebApplication.CreateBuilder(args);
+using eCommerce.Data;
+using Microsoft.EntityFrameworkCore;
+
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-var app = builder.Build();
+// Add Db context settings for the ProductDbContext
+builder.Services.AddDbContext<ProductDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+WebApplication app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
