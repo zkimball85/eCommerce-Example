@@ -35,5 +35,5 @@ public class Product
     public string? Description { get; set; }
 }
 
-// add migration after creating new columns in the Product model using the following command in the Package Manager Console:
+// add migration after creating new properties in the Product model using the following command in the Package Manager Console:
 // PM> Add-Migration AddNewColumnsToProductModel
