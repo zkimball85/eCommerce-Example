@@ -25,6 +25,7 @@ public class ProductController : Controller
     }
 
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(Product product)
     {
         if (ModelState.IsValid)
