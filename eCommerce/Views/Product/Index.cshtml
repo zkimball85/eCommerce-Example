@@ -1,0 +1,38 @@
+﻿@model IEnumerable<Product>
+@{
+    ViewData["Title"] = "Product Listings"; 
+
+}
+
+<h2>Product Listings</h2>
+
+<a asp-action="Create" asp-controller="Product" class="btn btn-success">Create New Product</a>
+
+@if (Model != null && Model.Any())
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>@Html.DisplayNameFor(model => model.First().Title)</th>
+                <th>@Html.DisplayNameFor(model => model.First().Price)</th>
+                <th>@Html.DisplayNameFor(model => model.First().Description)</th>
+                <th>Links</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (Product product in Model)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(p => product.Title)</td>
+                    <td>@Html.DisplayFor(p => product.Price)</td>
+                    <td>@Html.DisplayFor(p => product.Description)</td>
+                    <td>Update -- Delete</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-info">No products available.</div>
+}
