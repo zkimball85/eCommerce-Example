@@ -111,11 +111,6 @@ public class ProductController : Controller
 
     public async Task<IActionResult> Delete(int id)
     {
-        // Validate the product ID
-        if (id <= 0)
-        {
-            return BadRequest();
-        }
         // Retrieve the product from the database
         Product? product = await _context.Products.FindAsync(id);
 

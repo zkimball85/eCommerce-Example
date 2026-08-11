@@ -33,8 +33,7 @@
             @Html.DisplayFor(model => model.Description)
         </dd>
     </dl>
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="ProductId" />
+    <form asp-action="Delete" asp-route-id="@Model.ProductId">
         <input type="submit" value="Delete" class="btn btn-danger" /> |
         <a asp-action="Index">Back to Product listing</a>
     </form>
