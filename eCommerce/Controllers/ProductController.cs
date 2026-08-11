@@ -68,7 +68,7 @@ public class ProductController : Controller
     public async Task<IActionResult> Edit(int id)
     {
         // Retrieve the product from the database
-        Product? product = await _context.Products.Where(p => p.ProductId == id).FirstOrDefaultAsync();
+        Product? product = await _context.Products.FindAsync(id);
         if (product == null)
         {
             return NotFound();
