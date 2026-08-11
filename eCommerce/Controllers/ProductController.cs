@@ -79,4 +79,25 @@ public class ProductController : Controller
         }
         return View(product);
     }
+
+
+    [HttpGet]
+
+    public IActionResult Delete(int id)
+    {
+        // Validate the product ID
+        if (id <= 0)
+        {
+            return BadRequest();
+        }
+        // Retrieve the product from the database
+        Product? product = _context.Products.Where(p => p.ProductId == id).FirstOrDefault();
+
+        if (product == null)
+        {
+            return NotFound();
+        }
+
+        return View(product);
+    }
 }
