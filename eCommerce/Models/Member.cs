@@ -66,3 +66,23 @@ public class RegistrationViewModel
     [DataType(DataType.Date)]
     public DateOnly DateOfBirth { get; set; }
 }
+
+
+/// <summary>
+/// Represents the view model for member login,
+/// containing the necessary fields for user input during the login process.
+/// </summary>
+public class LoginViewModel
+{
+    // The username or email of the member.
+    [Required]
+    [StringLength(50)]
+    [RegularExpression("^[a-zA-Z0-9@._]+$", ErrorMessage = "Username can only contain alphanumeric characters and @._")]
+    public required string UsernameOrEmail { get; set; }
+
+    // The password of the member.
+    [Required]
+    [StringLength(50, MinimumLength = 8, ErrorMessage = "Password must be between 8 and 50 characters.")]
+    [DataType(DataType.Password)]
+    public required string Password { get; set; }
+}
