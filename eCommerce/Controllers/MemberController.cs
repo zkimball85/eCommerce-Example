@@ -60,6 +60,26 @@ public class MemberController : Controller
         return View();
     }
 
-    
-   
+
+    [HttpPost]
+    public async Task<IActionResult> Login(LoginViewModel login)
+    {
+        if (ModelState.IsValid)
+        {
+            // Check if the UsernameOrEmail and Password matches a record in the database
+            Member? loggedInMember = await _context.Members.Where(m => (m.Username == login.UsernameOrEmail || m.Email == login.UsernameOrEmail) && m.Password == login.Password).SingleOrDefaultAsync();
+
+            if (loggedInMember == null)
+            {
+                ModelState.AddModelError(string.Empty, "The provided username or email and password do not match any existing account.");
+                return View(login);
+            }
+
+            // Log the user in?
+
+            return RedirectToAction("Index", "Home");
+        }
+
+        return View(login);
+    }
 }
