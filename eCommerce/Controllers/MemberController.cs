@@ -47,6 +47,7 @@ public class MemberController : Controller
             // Add the new member to the database
             _context.Members.Add(newMember);
             await _context.SaveChangesAsync();
+
             // Redirect to Home Page
             return RedirectToAction("Index", "Home");
         }
