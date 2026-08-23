@@ -29,7 +29,26 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-controller="Product" asp-action="Index">Product Listings</a>
                         </li>
-                    </ul>
+                        @if (Context.Session.GetString("Username") == null){
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Member" asp-action="Register">Register</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Member" asp-action="Login">Login</a>
+                        </li>
+                        }
+                            else
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark">
+                                    Hello , @Context.Session.GetString("Username")!
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="Member" asp-action="Logout">Log Out</a>
+                                </li>
+                            }
+                        </ul>
                 </div>
             </div>
         </nav>
