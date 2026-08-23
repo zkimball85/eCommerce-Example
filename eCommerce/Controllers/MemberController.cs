@@ -60,9 +60,16 @@ public class MemberController : Controller
         return View();
     }
 
-
+    /// <summary>
+    /// Handles the login process for a member. Validates the input model,
+    /// checks the credentials against the database, and logs the user in if valid.
+    /// </summary>
+    /// <param name="login">The login view model.</param>
+    /// <returns>A redirect to the Home page if the login is successful, otherwise returns the login view with validation errors.</returns>
     [HttpPost]
     public async Task<IActionResult> Login(LoginViewModel login)
+
+
     {
         if (ModelState.IsValid)
         {
@@ -76,10 +83,19 @@ public class MemberController : Controller
             }
 
             // Log the user in?
+            HttpContext.Session.SetString("Username", loggedInMember.Username);
+            HttpContext.Session.SetInt32("MemberId", loggedInMember.MemberId);
 
             return RedirectToAction("Index", "Home");
         }
 
         return View(login);
+    }
+
+    public IActionResult Logout()
+    {
+        // Clear the session to log the user out
+        HttpContext.Session.Clear();
+        return RedirectToAction("Index", "Home");
     }
 }
