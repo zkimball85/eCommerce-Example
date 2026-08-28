@@ -32,6 +32,8 @@ public class ProductController : Controller
         // Get the total product count
         int totalProducts = await _context.Products.CountAsync();
         int totalPages = (int)Math.Ceiling(totalProducts / (double)PageSize);
+        if (totalPages > 0 && page > totalPages)
+            page = totalPages;
 
         if (totalPages > 0 && page > totalPages)
         {
