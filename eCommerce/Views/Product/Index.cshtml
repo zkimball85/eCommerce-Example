@@ -43,8 +43,10 @@
     </table>
     <!-- Pagination -->
     
-        int currentPage = (int)ViewData["CurrentPage"];
-        int totalPages = (int)ViewData["TotalPages"];
+        @{
+            int currentPage = (int)ViewData["CurrentPage"];
+            int totalPages = (int)ViewData["TotalPages"];
+        }
     
 
     @if (totalPages > 1)
