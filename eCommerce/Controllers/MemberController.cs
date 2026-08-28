@@ -22,10 +22,9 @@ public class MemberController : Controller
     }
 
     /// <summary>
-    /// Handles the registration of a new member. 
-    /// Validates the input model, maps it to the Member entity,
-    /// and saves it to the database. Redirects to the Home page
-    /// upon successful registration.
+    /// Handles the registration process for a new member. 
+    /// Validates the input model, checks for existing usernames
+    /// and emails in the database, and adds the new member if valid.
     /// </summary>
     /// <param name="reg">The registration view model.</param>
     /// <returns>A redirect to the Home page.</returns>
@@ -34,6 +33,27 @@ public class MemberController : Controller
     {
         if (ModelState.IsValid)
         {
+
+            // Check if the username or email already exists in the database
+            bool usernameExists = await _context.Members.AnyAsync(m => m.Username == reg.Username);
+            bool emailExists = await _context.Members.AnyAsync(m => m.Email == reg.Email);
+
+            // If either the username or email already exists, add a model error and return the view with the registration model
+            if (usernameExists)
+            {
+                ModelState.AddModelError(nameof(Member.Username), "This username is already taken.");
+            }
+
+            // If the email already exists, add a model error and return the view with the registration model
+            if (emailExists)
+            {
+                ModelState.AddModelError(nameof(Member.Email), "This email is already registered.");
+            }
+
+            if (usernameExists || emailExists)
+            {
+                return View(reg);
+            }
 
             // Map the RegistrationViewModel to the Member entity
             Member newMember = new()
