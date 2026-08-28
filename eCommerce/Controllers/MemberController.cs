@@ -83,10 +83,12 @@ public class MemberController : Controller
 
     /// <summary>
     /// Handles the login process for a member. Validates the input model,
-    /// checks the credentials against the database, and logs the user in if valid.
+    /// checks for matching username/email and password in the database,
+    /// and sets session variables if successful.
     /// </summary>
     /// <param name="login">The login view model.</param>
-    /// <returns>A redirect to the Home page if the login is successful, otherwise returns the login view with validation errors.</returns>
+    /// <returns>A redirect to the Home page if the login is successful,
+    /// otherwise returns the login view with validation errors.</returns>
     [HttpPost]
     public async Task<IActionResult> Login(LoginViewModel login)
 
@@ -95,7 +97,11 @@ public class MemberController : Controller
         if (ModelState.IsValid)
         {
             // Check if the UsernameOrEmail and Password matches a record in the database
-            Member? loggedInMember = await _context.Members.Where(m => (m.Username == login.UsernameOrEmail || m.Email == login.UsernameOrEmail) && m.Password == login.Password).SingleOrDefaultAsync();
+            var loggedInMember = await _context.Members
+                                    .Where(m => (m.Username == login.UsernameOrEmail || m.Email == login.UsernameOrEmail) 
+                                        && m.Password == login.Password)
+                                    .Select(m => new { m.MemberId, m.Username })
+                                    .SingleOrDefaultAsync();
 
             if (loggedInMember == null)
             {
