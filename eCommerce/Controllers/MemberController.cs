@@ -22,10 +22,9 @@ public class MemberController : Controller
     }
 
     /// <summary>
-    /// Handles the registration of a new member. 
-    /// Validates the input model, maps it to the Member entity,
-    /// and saves it to the database. Redirects to the Home page
-    /// upon successful registration.
+    /// Handles the registration process for a new member. 
+    /// Validates the input model, checks for existing usernames
+    /// and emails in the database, and adds the new member if valid.
     /// </summary>
     /// <param name="reg">The registration view model.</param>
     /// <returns>A redirect to the Home page.</returns>
@@ -34,6 +33,29 @@ public class MemberController : Controller
     {
         if (ModelState.IsValid)
         {
+
+            // Check if the username or email already exists in the database
+            bool usernameExists = await _context.Members.AnyAsync(m => m.Username == reg.Username);
+            bool emailExists = await _context.Members.AnyAsync(m => m.Email == reg.Email);
+
+
+            // If either the username or email already exists, add a model error and return the view with the registration model
+            if (usernameExists)
+            {
+                ModelState.AddModelError(nameof(Member.Username), "This username is already taken.");
+            }
+
+
+            // If the email already exists, add a model error and return the view with the registration model
+            if (emailExists)
+            {
+                ModelState.AddModelError(nameof(Member.Email), "This email is already registered.");
+            }
+
+            if (usernameExists || emailExists)
+            {
+                return View(reg);
+            }
 
             // Map the RegistrationViewModel to the Member entity
             Member newMember = new()
@@ -45,11 +67,30 @@ public class MemberController : Controller
             };
 
             // Add the new member to the database
-            _context.Members.Add(newMember);
-            await _context.SaveChangesAsync();
+            try
+            {
+                _context.Members.Add(newMember);
+                await _context.SaveChangesAsync();
+                return RedirectToAction("Index", "Home");
+            }
+            catch (DbUpdateException ex)
+            {
+                // SQL Server: 2601 or 2627
+                if (ex.InnerException?.Message.Contains("IX_Members_Username") == true)
+                {
+                    ModelState.AddModelError(nameof(reg.Username), "This username is already taken.");
+                    return View(reg);
+                }
 
-            // Redirect to Home Page
-            return RedirectToAction("Index", "Home");
+                if (ex.InnerException?.Message.Contains("IX_Members_Email") == true)
+                {
+                    ModelState.AddModelError(nameof(reg.Email), "This email is already registered.");
+                    return View(reg);
+                }
+
+                // Unknown DB error → rethrow
+                throw;
+            }
         }
 
         return View(reg);
@@ -63,11 +104,14 @@ public class MemberController : Controller
 
     /// <summary>
     /// Handles the login process for a member. Validates the input model,
-    /// checks the credentials against the database, and logs the user in if valid.
+    /// checks for matching username/email and password in the database,
+    /// and sets session variables if successful.
     /// </summary>
     /// <param name="login">The login view model.</param>
-    /// <returns>A redirect to the Home page if the login is successful, otherwise returns the login view with validation errors.</returns>
+    /// <returns>A redirect to the Home page if the login is successful,
+    /// otherwise returns the login view with validation errors.</returns>
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Login(LoginViewModel login)
 
 
@@ -75,7 +119,11 @@ public class MemberController : Controller
         if (ModelState.IsValid)
         {
             // Check if the UsernameOrEmail and Password matches a record in the database
-            Member? loggedInMember = await _context.Members.Where(m => (m.Username == login.UsernameOrEmail || m.Email == login.UsernameOrEmail) && m.Password == login.Password).SingleOrDefaultAsync();
+            var loggedInMember = await _context.Members
+                                    .Where(m => (m.Username == login.UsernameOrEmail || m.Email == login.UsernameOrEmail) 
+                                        && m.Password == login.Password)
+                                    .Select(m => new { m.MemberId, m.Username })
+                                    .SingleOrDefaultAsync();
 
             if (loggedInMember == null)
             {
