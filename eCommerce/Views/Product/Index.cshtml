@@ -1,7 +1,10 @@
 ﻿@model IEnumerable<Product>
 @{
-    ViewData["Title"] = "Product Listings"; 
+    ViewData["Title"] = "Product Listings";
 
+    // TYPE THIS IN: Declare variables at the top of the file
+    int currentPage = ViewData["CurrentPage"] != null ? (int)ViewData["CurrentPage"] : 1;
+    int totalPages = ViewData["TotalPages"] != null ? (int)ViewData["TotalPages"] : 0;
 }
 
 <h2>Product Listings</h2>
@@ -43,11 +46,11 @@
     </table>
     <!-- Pagination -->
     
-        int currentPage = (int)ViewData["CurrentPage"];
-        int totalPages = (int)ViewData["TotalPages"];
+   
     
 
-    @if (totalPages > 1)
+
+    if (totalPages > 1)
     {
         <nav aria-label="Page navigation" class="mt-4">
             <ul class="pagination">

@@ -33,6 +33,11 @@ public class ProductController : Controller
         int totalProducts = await _context.Products.CountAsync();
         int totalPages = (int)Math.Ceiling(totalProducts / (double)PageSize);
 
+        if (totalPages > 0 && page > totalPages)
+        {
+            page = totalPages;
+        }
+
         // Retrieve the products for the current page
         List<Product> products = await _context.Products
             .AsNoTracking()
