@@ -38,11 +38,13 @@ public class MemberController : Controller
             bool usernameExists = await _context.Members.AnyAsync(m => m.Username == reg.Username);
             bool emailExists = await _context.Members.AnyAsync(m => m.Email == reg.Email);
 
+
             // If either the username or email already exists, add a model error and return the view with the registration model
             if (usernameExists)
             {
                 ModelState.AddModelError(nameof(Member.Username), "This username is already taken.");
             }
+
 
             // If the email already exists, add a model error and return the view with the registration model
             if (emailExists)
@@ -65,11 +67,30 @@ public class MemberController : Controller
             };
 
             // Add the new member to the database
-            _context.Members.Add(newMember);
-            await _context.SaveChangesAsync();
+            try
+            {
+                _context.Members.Add(newMember);
+                await _context.SaveChangesAsync();
+                return RedirectToAction("Index", "Home");
+            }
+            catch (DbUpdateException ex)
+            {
+                // SQL Server: 2601 or 2627
+                if (ex.InnerException?.Message.Contains("IX_Members_Username") == true)
+                {
+                    ModelState.AddModelError(nameof(reg.Username), "This username is already taken.");
+                    return View(reg);
+                }
 
-            // Redirect to Home Page
-            return RedirectToAction("Index", "Home");
+                if (ex.InnerException?.Message.Contains("IX_Members_Email") == true)
+                {
+                    ModelState.AddModelError(nameof(reg.Email), "This email is already registered.");
+                    return View(reg);
+                }
+
+                // Unknown DB error → rethrow
+                throw;
+            }
         }
 
         return View(reg);
@@ -90,6 +111,7 @@ public class MemberController : Controller
     /// <returns>A redirect to the Home page if the login is successful,
     /// otherwise returns the login view with validation errors.</returns>
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Login(LoginViewModel login)
 
 
