@@ -17,15 +17,36 @@ public class ProductController : Controller
         _context = context;
     }
 
+    private const int PageSize = 3;
+
     /// <summary>
-    /// Handles the GET request to display the list of products.
+    /// Handles the GET request to display the list of products with pagination.
     /// </summary>
+    /// <param name="page">The page number to display (default is 1).</param>
     /// <returns>A <see cref="Task{IActionResult}"/> representing the asynchronous operation.</returns>
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(int page = 1)
     {
-        // Retrieve the list of products from the database
-        List<Product> allProducts = await _context.Products.AsNoTracking().ToListAsync();
-        return View(allProducts);
+        if (page < 1)
+            page = 1;
+
+        // Get the total product count
+        int totalProducts = await _context.Products.CountAsync();
+        int totalPages = (int)Math.Ceiling(totalProducts / (double)PageSize);
+
+        // Retrieve the products for the current page
+        List<Product> products = await _context.Products
+            .AsNoTracking()
+            .OrderBy(p => p.Title)
+            .Skip((page - 1) * PageSize)
+            .Take(PageSize)
+            .ToListAsync();
+
+        // Pass pagination info to the view using ViewData
+        ViewData["CurrentPage"] = page;
+        ViewData["TotalPages"] = totalPages;
+        ViewData["TotalProducts"] = totalProducts;
+
+        return View(products);
     }
 
     [HttpGet]
