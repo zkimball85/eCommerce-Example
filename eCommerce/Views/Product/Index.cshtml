@@ -110,7 +110,7 @@
                            asp-route-maxPrice="@ViewData["MaxPrice"]">Next</a>
                     </li>
                     <li class="page-item">
-                        <a class="page-link" asp-action="Index" asp-route-page="@(currentPage - 1)"
+                        <a class="page-link" asp-action="Index" asp-route-page="@totalPages"
                            asp-route-searchString="@ViewData["SearchString"]"
                            asp-route-minPrice="@ViewData["MinPrice"]"
                            asp-route-maxPrice="@ViewData["MaxPrice"]">Last</a>
