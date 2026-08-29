@@ -20,38 +20,62 @@ public class ProductController : Controller
     private const int PageSize = 3;
 
     /// <summary>
-    /// Handles the GET request to display the list of products with pagination.
+    /// Displays a list of products with optional search and price filtering, along with pagination.
     /// </summary>
+    /// <param name="searchString">The search string to filter products by title.</param>
+    /// <param name="minPrice">The minimum price to filter products by.</param>
+    /// <param name="maxPrice">The maximum price to filter products by.</param>
     /// <param name="page">The page number to display (default is 1).</param>
     /// <returns>A <see cref="Task{IActionResult}"/> representing the asynchronous operation.</returns>
-    public async Task<IActionResult> Index(int page = 1)
+    public async Task<IActionResult> Index(string searchString, decimal? minPrice, decimal? maxPrice, int page = 1)
     {
         if (page < 1)
             page = 1;
 
-        // Get the total product count
-        int totalProducts = await _context.Products.CountAsync();
+        // Start building the query but DO NOT execute it yet
+        IQueryable<Product> query = _context.Products.AsNoTracking();
+
+        // Apply our filters to the query if the user typed anything in
+        if (!string.IsNullOrEmpty(searchString))
+        {
+            query = query.Where(p => p.Title.Contains(searchString));
+        }
+
+        if (minPrice.HasValue)
+        {
+            query = query.Where(p => p.Price >= minPrice.Value);
+        }
+
+        if (maxPrice.HasValue)
+        {
+            query = query.Where(p => p.Price <= maxPrice.Value);
+        }
+
+        // Get the total count of the FILTERED products
+        int totalProducts = await query.CountAsync();
         int totalPages = (int)Math.Ceiling(totalProducts / (double)PageSize);
-        if (totalPages > 0 && page > totalPages)
-            page = totalPages;
 
         if (totalPages > 0 && page > totalPages)
         {
             page = totalPages;
         }
 
-        // Retrieve the products for the current page
-        List<Product> products = await _context.Products
-            .AsNoTracking()
+        // Now execute the query to get the current page of filtered products
+        List<Product> products = await query
             .OrderBy(p => p.Title)
             .Skip((page - 1) * PageSize)
             .Take(PageSize)
             .ToListAsync();
 
-        // Pass pagination info to the view using ViewData
+        // Pass pagination info
         ViewData["CurrentPage"] = page;
         ViewData["TotalPages"] = totalPages;
         ViewData["TotalProducts"] = totalProducts;
+
+        // Pass the search parameters back to the view so the input boxes don't clear out
+        ViewData["SearchString"] = searchString;
+        ViewData["MinPrice"] = minPrice;
+        ViewData["MaxPrice"] = maxPrice;
 
         return View(products);
     }
